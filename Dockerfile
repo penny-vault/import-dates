@@ -6,8 +6,8 @@ RUN mage -v build
 
 FROM alpine
 
-# Add pv as a user
-RUN adduser -D pv
+# Add timezone data and create pv user
+RUN apk add tzdata && adduser -D pv
 # Run pv as non-privileged
 USER pv
 WORKDIR /home/pv
