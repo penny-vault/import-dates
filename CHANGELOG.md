@@ -6,8 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Download market holidays from polygon.io
-- Inspect EOD and add dates to trading_days table
 
 ### Changed
 
@@ -19,4 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-[Unreleased]: https://github.com/penny-vault/import-dates/commits/main
+## [0.1.0] - 2022-05-26
+### Added
+- Download market holidays from polygon.io
+- Inspect EOD and add dates to trading_days table
+
+[Unreleased]: https://github.com/penny-vault/import-fred/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/penny-vault/import-fred/releases/tag/v0.1.0
