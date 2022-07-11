@@ -60,24 +60,32 @@ func MarketHolidays() (holidays []*common.MarketHoliday, err error) {
 
 	for _, holiday := range polygonHolidays {
 		if holiday.Exchange == "NASDAQ" {
-			fmt.Printf("%+v\n", holiday)
 			var date time.Time
 			date, err = time.Parse("2006-01-02", holiday.Date)
 			if err != nil {
 				log.Error().Err(err).Msg("could not parse date")
 				return
 			}
+			date = time.Date(date.Year(), date.Month(), date.Day(), 16, 0, 0, 0, nyc)
+
 			var close time.Time
-			close, _ = time.Parse("2006-01-02T15:04:05Z07:00", holiday.Close)
-			holidays = append(holidays, &common.MarketHoliday{
+			close, err = time.Parse("2006-01-02T15:04:05Z07:00", holiday.Close)
+			if err != nil {
+				close = date
+			} else {
+				close = close.In(nyc)
+			}
+
+			holiday := &common.MarketHoliday{
 				Name:       holiday.Name,
-				Date:       date.In(nyc),
+				Date:       date,
 				Market:     "us",
 				EarlyClose: holiday.Status == "early-close",
-				CloseTime:  close.In(nyc),
-			})
+				CloseTime:  close,
+			}
+			holidays = append(holidays, holiday)
 		}
 	}
 
-	return
+	return holidays, nil
 }

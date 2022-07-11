@@ -1,4 +1,4 @@
-name: Build
+name: "Build"
 
 on:
   pull_request:
@@ -8,16 +8,15 @@ jobs:
   mage:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Set up Go
+      
+      - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version-file: 'go.mod'
-      -
-        name: Run Mage
+      
+      - name: Run Mage
         uses: magefile/mage-action@v2
         with:
           version: latest

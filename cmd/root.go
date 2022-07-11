@@ -28,16 +28,27 @@ import (
 )
 
 var cfgFile string
+var skipSaveDB bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "import-dates",
 	Short: "Add info about trading days and market holidays to database",
 	Run: func(cmd *cobra.Command, args []string) {
-		if holidays, err := polygon.MarketHolidays(); err == nil {
-			database.SaveMarketHolidays(holidays)
+		if skipSaveDB {
+			log.Info().Msg("skipping database save")
 		}
-		database.SyncTradingDays()
+		if holidays, err := polygon.MarketHolidays(); err == nil {
+			for _, holiday := range holidays {
+				fmt.Printf("Market Holiday: %+v\n", holiday)
+			}
+			if !skipSaveDB {
+				database.SaveMarketHolidays(holidays)
+			}
+		}
+		if !skipSaveDB {
+			database.SyncTradingDays()
+		}
 	},
 }
 
@@ -63,6 +74,8 @@ func init() {
 	viper.BindPFlag("polygon.token", rootCmd.PersistentFlags().Lookup("polygon-token"))
 	rootCmd.PersistentFlags().String("history-ticker", "SPY", "ticker to use for tading history")
 	viper.BindPFlag("history_ticker", rootCmd.PersistentFlags().Lookup("history-ticker"))
+	rootCmd.PersistentFlags().BoolVar(&skipSaveDB, "skipSaveDB", false, "skip saving to database (for debug)")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
