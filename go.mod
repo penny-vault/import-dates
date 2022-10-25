@@ -7,7 +7,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/magefile/mage v1.14.0
 	github.com/rs/zerolog v1.28.0
-	github.com/spf13/cobra v1.6.0
+	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.13.0
 )
 
