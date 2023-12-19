@@ -46,7 +46,10 @@ func SyncTradingDays() (err error) {
 		var tradingDay time.Time
 		if err = rows.Scan(&tradingDay); err != nil {
 			log.Error().Err(err).Msg("fetch existing trading days failed")
-			tx.Rollback(ctx)
+			err = tx.Rollback(ctx)
+			if err != nil {
+				log.Error().Err(err).Msg("could not rollback db transaction")
+			}
 			return
 		}
 		days = append(days, tradingDay)
@@ -55,7 +58,10 @@ func SyncTradingDays() (err error) {
 	for _, tradingDay := range days {
 		if _, err = tx.Exec(ctx, `INSERT INTO trading_days ("trading_day", "market") VALUES ($1, 'us') ON CONFLICT ON CONSTRAINT trading_days_pkey DO NOTHING`, tradingDay); err != nil {
 			log.Error().Err(err).Time("TradingDay", tradingDay).Msg("insert trading day failed")
-			tx.Rollback(ctx)
+			err = tx.Rollback(ctx)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to rollback db transaction")
+			}
 			return
 		}
 	}
@@ -108,7 +114,11 @@ func SaveMarketHolidays(holidays []*common.MarketHoliday) (err error) {
 
 		if err != nil {
 			log.Error().Err(err).Msg("could not save market holiay to database")
-			tx.Rollback(ctx)
+			err = tx.Rollback(ctx)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to rollback db transaction")
+			}
+
 			return err
 		}
 	}

@@ -43,11 +43,17 @@ var rootCmd = &cobra.Command{
 				fmt.Printf("Market Holiday: %+v\n", holiday)
 			}
 			if !skipSaveDB {
-				database.SaveMarketHolidays(holidays)
+				err = database.SaveMarketHolidays(holidays)
+				if err != nil {
+					log.Error().Err(err).Msg("saving market holidays to db failed")
+				}
 			}
 		}
 		if !skipSaveDB {
-			database.SyncTradingDays()
+			err := database.SyncTradingDays()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to sync trading days")
+			}
 		}
 	},
 }
@@ -67,13 +73,29 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.import-dates.yaml)")
 	rootCmd.PersistentFlags().Bool("log.json", false, "print logs as json to stderr")
-	viper.BindPFlag("log.json", rootCmd.PersistentFlags().Lookup("log.json"))
+	err := viper.BindPFlag("log.json", rootCmd.PersistentFlags().Lookup("log.json"))
+	if err != nil {
+		log.Error().Err(err).Msg("could not bind PFlag log.json")
+	}
+
 	rootCmd.PersistentFlags().StringP("database-url", "d", "host=localhost port=5432", "DSN for database connection")
-	viper.BindPFlag("database.url", rootCmd.PersistentFlags().Lookup("database-url"))
+	err = viper.BindPFlag("database.url", rootCmd.PersistentFlags().Lookup("database-url"))
+	if err != nil {
+		log.Error().Err(err).Msg("could not bind PFlag database.url")
+	}
+
 	rootCmd.PersistentFlags().String("polygon-token", "<not-set>", "polygon API key token")
-	viper.BindPFlag("polygon.token", rootCmd.PersistentFlags().Lookup("polygon-token"))
+	err = viper.BindPFlag("polygon.token", rootCmd.PersistentFlags().Lookup("polygon-token"))
+	if err != nil {
+		log.Error().Err(err).Msg("could not bind PFlag polygon.token")
+	}
+
 	rootCmd.PersistentFlags().String("history-ticker", "SPY", "ticker to use for tading history")
-	viper.BindPFlag("history_ticker", rootCmd.PersistentFlags().Lookup("history-ticker"))
+	err = viper.BindPFlag("history_ticker", rootCmd.PersistentFlags().Lookup("history-ticker"))
+	if err != nil {
+		log.Error().Err(err).Msg("could not bind PFlag history_ticker")
+	}
+
 	rootCmd.PersistentFlags().BoolVar(&skipSaveDB, "skipSaveDB", false, "skip saving to database (for debug)")
 
 }
